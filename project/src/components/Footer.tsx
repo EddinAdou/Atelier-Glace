@@ -30,7 +30,7 @@ const Footer = () => {
             <p>Abidjan, Côte d'Ivoire</p>
             <div className="flex items-center gap-2">
               <Phone size={16} />
-              <span>+225 07 59 81 23 66</span>
+              <span><a href="tel:+2250759812366">+225 07 59 81 23 66</a></span>
             </div>
           </div>
         </div>
