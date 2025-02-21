@@ -2,6 +2,8 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../components/CartContext';
 import ProductCard from '../components/ProductCard';
+import { useToast } from '../components/ToastContext';
+
 
 interface Product {
   id: number;
@@ -71,6 +73,7 @@ const Shop: React.FC = () => {
   const category = searchParams.get('category');
   const search = searchParams.get('search')?.trim() || '';
   const { addToCart } = useCart();
+  const { showToast } = useToast();
 
   // Filtrer les produits en fonction de la catégorie et/ou de la recherche
   let filteredProducts = products;
@@ -104,6 +107,8 @@ const Shop: React.FC = () => {
       quantity: 1,
       image: product.image,
     });
+    showToast(`Le produit "${product.name}" a été ajouté au panier.`, 'success');
+
   };
 
   return (

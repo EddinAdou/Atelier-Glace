@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCart } from '../components/CartContext';
+import Toast from '../components/Toast';
 
 interface Product {
   id: number;
@@ -13,6 +14,7 @@ interface Product {
 const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const { addToCart } = useCart();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     const storedProduct = localStorage.getItem('selectedProduct');
@@ -22,18 +24,41 @@ const ProductDetails = () => {
   }, []);
 
   if (!product) {
-    return <p className="py-12 px-6 text-base font-thin">Aucun produit sélectionné. Veuillez retourner à la page shop.</p>;
+    return (
+        <p className="py-12 px-6 text-base font-thin">
+          Aucun produit sélectionné. Veuillez retourner à la page shop.
+        </p>
+    );
   }
 
   const handleAjoutPanier = () => {
-    // On ajoute le produit avec une quantité par défaut à 1
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.images[0]
-    });
+    try {
+      // Tentative d'ajout au panier
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.images[0]
+      });
+      // Message de succès
+      setToast({
+        message: `L'article "${product.name}" a été ajouté avec succès dans le panier.`,
+        type: 'success'
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setToast({
+          message: `Échec de l'ajout du produit : ${error.message}`,
+          type: 'error'
+        });
+      } else {
+        setToast({
+          message: "Échec de l'ajout du produit : erreur inconnue.",
+          type: 'error'
+        });
+      }
+    }
   };
 
   return (
@@ -46,7 +71,7 @@ const ProductDetails = () => {
                       key={index}
                       src={image}
                       alt={`${product.name} - Vue ${index + 1}`}
-                      className="w-full text-base font-thin"
+                      className="w-full"
                   />
               ))}
             </div>
@@ -63,6 +88,14 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
+        {/* Affichage du Toast si présent */}
+        {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
       </div>
   );
 };
